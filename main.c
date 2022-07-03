@@ -1,6 +1,44 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int disassemble_and_display(unsigned char *codebuffer, int pc);
+
+int main(int argc, char **argv){
+  if(argc < 2){
+    printf("error:please provide an executable to disassemble\n");
+    return 1;
+  }
+
+  FILE *f = fopen(argv[1], "rb");
+  if(f == NULL){
+    printf("error:failed to read %s file", argv[1]);
+    return 1;
+  }
+  
+  // move file cursor position to the end
+  fseek(f, 0L, SEEK_END);
+  // ftell return the cursor position
+  int fsize = ftell(f);
+  // move file cursor position to the beginning
+  fseek(f, 0L, SEEK_SET);
+
+  unsigned char *buffer = malloc(fsize);
+
+  // load file in memory
+  fread(buffer, fsize, 1, f);
+  fclose(f);
+
+  int pc = 0;
+  while(pc < fsize){
+    pc += disassemble_and_display(buffer, pc);
+  }
+
+  // can apparently be discussed
+  free(buffer);
+
+  return 0;
+}
+
 int disassemble_and_display(unsigned char *codebuffer, int pc){
   unsigned char *code = &codebuffer[pc];
   int opbyte = 1;
@@ -795,40 +833,4 @@ int disassemble_and_display(unsigned char *codebuffer, int pc){
   printf("\n");
 
   return opbyte;
-}
-
-int main(int argc, char **argv){
-  if(argc < 2){
-    printf("error:please provide an executable to disassemble\n");
-    return 1;
-  }
-
-  FILE *f = fopen(argv[1], "rb");
-  if(f == NULL){
-    printf("error:failed to read %s file", argv[1]);
-    return 1;
-  }
-  
-  // move file cursor position to the end
-  fseek(f, 0L, SEEK_END);
-  // ftell return the cursor position
-  int fsize = ftell(f);
-  // move file cursor position to the beginning
-  fseek(f, 0L, SEEK_SET);
-
-  unsigned char *buffer = malloc(fsize);
-
-  // load file in memory
-  fread(buffer, fsize, 1, f);
-  fclose(f);
-
-  int pc = 0;
-  while(pc < fsize){
-    pc += disassemble_and_display(buffer, pc);
-  }
-
-  // can apparently be discussed
-  free(buffer);
-
-  return 0;
 }
