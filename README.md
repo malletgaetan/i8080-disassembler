@@ -5,7 +5,7 @@ build the disassembler executable
 gcc main.c
 ```
 
-disassemble an intel 8080 executable file
+disassemble with
 ```
 ./a.out invaders.h | vi
 ```
